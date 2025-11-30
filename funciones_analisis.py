@@ -15,3 +15,11 @@ def sumar_area(gdf, columna):
     if columna in gdf.columns:
         return round(gdf[columna].sum(), 2)
     return "No disponible"
+
+def resumen_superposiciones(superposiciones):
+    resumen = {
+        nombre: len(gdf)
+        for nombre, gdf in superposiciones.items()
+    }
+    df_resumen = pd.DataFrame.from_dict(resumen, orient="index", columns=["Número de zonas"])
+    return df_resumen

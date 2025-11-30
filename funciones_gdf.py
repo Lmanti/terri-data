@@ -4,7 +4,7 @@ import requests
 from io import BytesIO
 from constantes import DEPARTAMENTO, GEOMETRY, EPSG_4326, EPSG_3116, AREA_HA
 
-def cargar_geojson(url, max_intentos=3, espera=1):
+def cargar_geojson(url, max_intentos=3, espera=3):
     intento = 1
     
     while intento <= max_intentos:
@@ -88,6 +88,58 @@ def normalizar_area(gdf, columnas_posibles, columna_salida):
     gdf[columna_salida] = gdf[col_original]
 
     return gdf
+
+def limpiar_columnas_conflictivas(gdf):
+    conflictivas = [c for c in gdf.columns if c.endswith("_1")]
+    return gdf.drop(columns=conflictivas, errors="ignore")
+
+def deduplicar_por_objectid(gdf):
+    """
+    Busca columnas que representen el ID original del territorio.
+    Ejemplos:
+        OBJECTID
+        OBJECTID_1
+        OBJECTID_2
+    """
+    cols_id = [c for c in gdf.columns if "OBJECTID" in c]
+
+    if len(cols_id) == 0:   # no hay ID → no deduplicamos
+        return gdf
+
+    return gdf.drop_duplicates(subset=cols_id)
+
+def identificar_superposiciones(gdf_zrc, gdf_neg, gdf_ind):
+    """
+    Retorna un diccionario con GeoDataFrames de las intersecciones.
+    """
+    resultados = {}
+
+    # Limpiar columnas conflictivas
+    gdf_zrc = limpiar_columnas_conflictivas(gdf_zrc)
+    gdf_neg = limpiar_columnas_conflictivas(gdf_neg)
+    gdf_ind = limpiar_columnas_conflictivas(gdf_ind)
+
+    # Intersecciones binarias
+    inter_zrc_neg = gpd.overlay(gdf_zrc, gdf_neg, how="intersection", keep_geom_type=False)
+    inter_zrc_neg = deduplicar_por_objectid(inter_zrc_neg)
+
+    inter_zrc_ind = gpd.overlay(gdf_zrc, gdf_ind, how="intersection", keep_geom_type=False)
+    inter_zrc_ind = deduplicar_por_objectid(inter_zrc_ind)
+
+    inter_neg_ind = gpd.overlay(gdf_neg, gdf_ind, how="intersection", keep_geom_type=False)
+    inter_neg_ind = deduplicar_por_objectid(inter_neg_ind)
+
+    # Intersección triple
+    inter_triple = gpd.overlay(inter_zrc_neg, gdf_ind, how="intersection", keep_geom_type=False)
+    inter_triple = deduplicar_por_objectid(inter_triple)
+
+    # Guardar resultados
+    resultados["ZRC ∩ Consejos"] = inter_zrc_neg
+    resultados["ZRC ∩ Resguardos"] = inter_zrc_ind
+    resultados["Consejos ∩ Resguardos"] = inter_neg_ind
+    resultados["ZRC ∩ Consejos ∩ Resguardos"] = inter_triple
+
+    return resultados
 
 def cargar_geojson_local(path):
     return gpd.read_file(path)

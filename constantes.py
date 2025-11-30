@@ -1,3 +1,8 @@
+GEOJSON_NEGRITUDES = "https://utility.arcgis.com/usrsvcs/servers/abf2f9f6727b4073902c1f57c280d5dc/rest/services/DatosAbiertos/Consejo_Comunitario_Titulado/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
+# GEOJSON_RESGUARDOS = "https://utility.arcgis.com/usrsvcs/servers/8944116ccfd34a7189c4bc44b8e19186/rest/services/DatosAbiertos/Resguardo_Indigena_Formalizado/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
+GEOJSON_RESGUARDOS = "./Resguardo_Indigena_Formalizado.geojson"
+GEOJSON_RESERVAS = "https://utility.arcgis.com/usrsvcs/servers/0eca5beb8afe43708622fdd7646cd577/rest/services/DatosAbiertos/Zonas_de_Reserva_Campesina_Constituida/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
+JSON_DIVIPOLA = "vcjz-niiq"
 DEPARTAMENTO = "DEPARTAMENTO"
 CODIGO_DEP = "CODIGO_DEP"
 GEOMETRY = "geometry"
