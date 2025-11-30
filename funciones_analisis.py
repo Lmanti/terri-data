@@ -1,6 +1,5 @@
 import pandas as pd
-
-DEPARTAMENTO = "DEPARTAMENTO"
+from constantes import DEPARTAMENTO
 
 def ranking_departamentos(gdf, nombre_figura):
     if DEPARTAMENTO not in gdf.columns:
@@ -12,7 +11,7 @@ def ranking_departamentos(gdf, nombre_figura):
         .sort_values(nombre_figura, ascending=False)
     )
 
-def sumar_area(gdf):
-    if "area_ha" in gdf.columns:
-        return round(gdf["area_ha"].sum(), 2)
+def sumar_area(gdf, columna):
+    if columna in gdf.columns:
+        return round(gdf[columna].sum(), 2)
     return "No disponible"

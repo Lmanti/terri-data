@@ -1,11 +1,92 @@
+import time
 import geopandas as gpd
 import requests
 from io import BytesIO
+from constantes import DEPARTAMENTO, GEOMETRY, EPSG_4326, EPSG_3116, AREA_HA
 
-def cargar_geojson(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    gdf = gpd.read_file(BytesIO(response.content))
+def cargar_geojson(url, max_intentos=3, espera=1):
+    intento = 1
+    
+    while intento <= max_intentos:
+        try:
+            print(f"Intento #{intento}")
+            response = requests.get(url, timeout=30)
+            response.raise_for_status()
+            
+            gdf = gpd.read_file(BytesIO(response.content))
+            print("Datos cargados exitosamente.")
+            return gdf
+        except requests.exceptions.RequestException as e:
+            print(f"⚠ Error: {e}")
+            intento += 1
+            if intento <= max_intentos:
+                print(f"Reintentando en {espera} segundo(s)...\n")
+                time.sleep(espera)
+    
+    print(f"❌ No se pudo obtener el recurso después de {max_intentos} intentos: {url}")
+    return gpd.GeoDataFrame()
+
+def separar_datos(gdf, columna):
+    if columna not in gdf.columns:
+        return gdf
+    
+    gdf[columna] = gdf[columna].astype(str)
+    gdf[columna] = gdf[columna].str.split(",")
+    gdf = gdf.explode(columna)
+    gdf[columna] = gdf[columna].str.strip()
+    return gdf
+
+def reemplazar_codigo_por_nombre(gdf, df_departamentos):
+    """
+    Reemplaza la columna DEPARTAMENTO (codigos) por los nombres
+    usando la tabla oficial de departamentos (df_departamentos).
+    """
+    if DEPARTAMENTO not in gdf.columns:
+        print("No existe columna DEPARTAMENTO en el GDF")
+        return gdf
+
+    gdf[DEPARTAMENTO] = gdf[DEPARTAMENTO].astype(str).str.strip()
+    gdf[DEPARTAMENTO] = gdf[DEPARTAMENTO].str.zfill(2)
+
+    df_departamentos["codigo_departamento"] = (
+        df_departamentos["codigo_departamento"]
+        .astype(str)
+        .str.zfill(2)
+    )
+    map_dict = dict(zip(
+        df_departamentos["codigo_departamento"],
+        df_departamentos["nombre_departamento"]
+    ))
+    gdf[DEPARTAMENTO] = gdf[DEPARTAMENTO].map(map_dict)
+    return gdf
+
+def normalizar_area(gdf, columnas_posibles, columna_salida):
+    """
+    Toma una lista de nombres de columnas de área y usa la que exista.
+    Luego crea una columna AREA_TOTAL combinando esa área original
+    con gdf["area_ha"] si está presente.
+    """
+
+    col_original = None
+    for col in columnas_posibles:
+        if col in gdf.columns:
+            col_original = col
+            break
+
+    if col_original is None:
+        gdf[columna_salida] = gdf.get(AREA_HA, None)
+        return gdf
+
+    # Convertir columnas a numéricas limpiamente
+    gdf[col_original] = (
+        gdf[col_original]
+        .astype(str)
+        .str.replace(",", ".")
+        .astype(float)
+    )
+
+    gdf[columna_salida] = gdf[col_original]
+
     return gdf
 
 def cargar_geojson_local(path):
@@ -18,29 +99,37 @@ def eliminar_duplicados(gdf):
     return gdf.drop_duplicates()
 
 def reparar_geometrias(gdf):
-    gdf["geometry"] = gdf["geometry"].buffer(0)
+    gdf[GEOMETRY] = gdf[GEOMETRY].buffer(0)
     return gdf
 
 def eliminar_geometrias_nulas(gdf):
-    return gdf[~gdf["geometry"].isna()]
+    return gdf[~gdf[GEOMETRY].isna()]
 
 def estandarizar_crs(gdf):
     if gdf.crs is None:
-        gdf = gdf.set_crs("EPSG:4326")
+        gdf = gdf.set_crs(EPSG_4326)
     else:
-        gdf = gdf.to_crs("EPSG:4326")
+        gdf = gdf.to_crs(EPSG_4326)
     return gdf
 
 def calcular_area_hectareas(gdf):
     # Proyección métrica de Colombia
-    gdf_proj = gdf.to_crs("EPSG:3116")
-    gdf["area_ha"] = gdf_proj.geometry.area / 10000
+    gdf_proj = gdf.to_crs(EPSG_3116)
+    gdf[AREA_HA] = gdf_proj.geometry.area / 10000
     return gdf
 
-def limpiar_gdf(gdf):
+def limpiar_gdf(gdf): 
     gdf = eliminar_duplicados(gdf)
     gdf = reparar_geometrias(gdf)
     gdf = eliminar_geometrias_nulas(gdf)
     gdf = estandarizar_crs(gdf)
     gdf = calcular_area_hectareas(gdf)
+    return gdf
+
+def separar_listas_en_columna(gdf, columna_objetivo, columna_reemplazar):
+    if columna_objetivo in gdf.columns:
+        if columna_reemplazar in gdf.columns:
+            gdf = gdf.drop(columns=[columna_reemplazar])
+        gdf = separar_datos(gdf, columna_objetivo)
+        gdf = gdf.rename(columns={columna_objetivo: columna_reemplazar})
     return gdf
