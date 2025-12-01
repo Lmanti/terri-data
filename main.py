@@ -12,11 +12,11 @@ from constantes import DEPARTAMENTO, CODIGO_DEP, AREA_TOTAL, AREA_HA, GEOJSON_NE
 # CONFIGURAR EL DASHBOARD
 # ------------------------------------------------------------
 st.set_page_config(
-    page_title="Dashboard – Territorios Colectivos en Colombia",
+    page_title="Dashboard – TERRIDATA",
     layout="wide"
 )
 
-st.title("📍 Dashboard – Territorios Colectivos en Colombia")
+st.title("📍 TERRIDATA – Visor intercultural de superposiciones territoriales")
 
 st.markdown("""
 Este dashboard permite visualizar:
@@ -25,6 +25,7 @@ Este dashboard permite visualizar:
 - Consejos Comunitarios (Comunidades Negras)
 - Ranking departamental
 - Estadísticas de extensión territorial
+- Superposición territorial
 """)
 
 # ------------------------------------------------------------
