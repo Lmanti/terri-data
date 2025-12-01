@@ -152,6 +152,41 @@ resumen = resumen_superposiciones(superposiciones)
 st.table(resumen)
 
 # ------------------------------------------------------------
+# RECOMENDACIONES
+# ------------------------------------------------------------
+st.header("🧭 Recomendaciones para la Agencia Nacional de Tierras (ANT)")
+st.markdown("""
+Con base en el análisis territorial de **Zonas de Reserva Campesina**, **Resguardos Indígenas** y **Consejos Comunitarios**, se formulan **9 recomendaciones estratégicas** orientadas a fortalecer la gobernanza intercultural, mejorar la formalización y optimizar el uso de datos geoespaciales en Colombia.
+
+### 1. Actualizar y depurar periódicamente los datos abiertos
+Establecer ciclos de actualización semestral para asegurar datos confiables, completos y adecuados para la planificación territorial.
+
+### 2. Priorizar la formalización donde coexisten múltiples figuras
+Focalizar esfuerzos en territorios donde coinciden comunidades **indígenas, campesinas y afrodescendientes**, especialmente en **Cauca, Chocó, Nariño, Amazonas y Putumayo**.
+
+### 3. Implementar un sistema de alertas tempranas de superposición
+Detectar traslapes o proximidades conflictivas **antes** de aprobar nuevas solicitudes o procesos administrativos.
+
+### 4. Priorizar el uso de un visor geográfico unificado
+Priorizar un visor público e interoperable que consolide **ZRC, Resguardos y Consejos Comunitarios**, ofreciendo una consulta clara y actualizada para la ciudadanía y entidades.
+
+### 5. Crear una guía técnica nacional de coexistencia territorial
+Elaborar lineamientos que orienten la armonización entre figuras territoriales en zonas contiguas o sobrepuestas.
+
+### 6. Fortalecer la participación intercultural
+Impulsar mesas territoriales entre cabildos, juntas campesinas y consejos comunitarios en municipios con alta densidad de figuras.
+
+### 7. Realizar análisis periódicos de extensión y formalización
+Evaluar la relación entre tamaño del territorio, presión demográfica y nivel de formalización para priorizar intervenciones.
+
+### 8. Establecer un protocolo técnico-jurídico para resolver superposiciones
+Crear un procedimiento institucional con componentes técnicos, jurídicos e interculturales para decisiones más rápidas y consistentes.
+
+### 9. Fomentar estudios de riesgo de acaparamiento
+Identificar territorios con baja formalización para prevenir procesos de despojo o apropiación indebida del territorio colectivo.
+""")
+
+# ------------------------------------------------------------
 # FIN DEL DASHBOARD
 # ------------------------------------------------------------
 st.markdown("___")
