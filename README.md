@@ -10,6 +10,7 @@
 - Alexis de Jesús Ahumada Piñeres
 
 **Documentación técnica:** [TERRIDATA - Documentacion tecnica](./recursos/TERRIDATA_Documentacion_tecnica.pdf)
+**Presentación:** [TERRIDATA - Presentación](https://docs.google.com/presentation/d/14OaMdBhXoaP6rclIGojqxWzWPPdI-9oWfqg0Q3UhbRk/edit?usp=sharing)
 
 ---
 
