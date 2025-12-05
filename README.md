@@ -52,6 +52,8 @@ El dashboard ofrece análisis de **extensión territorial**, **ranking departame
 
 ## 🛠 Instalación
 
+**Importante!!:** Necesitarás tener Python 3.11.2 en tu PC!
+
 1. Clonar el repositorio:
 
 ```bash
